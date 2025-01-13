@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Produk</h1>
+    </div><!-- End Page Title -->
+
+      {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">List Produk</h5>
+
+              <!-- Table with stripped rows -->
+              <table class="table datatable">
+                <thead>
+                  <tr>
+                    <th style="width: 40%">
+                      Nama Produk
+                    </th>
+                    <th>Harga</th>
+                    <th>Kategori</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for produk in produks %}
+                        <tr>
+                            <td>{{ produk }}</td>
+                            <td>Rp. {{ produk.harga }}</td>
+                            <td>{{ produk.kategori }}</td>
+                            <td>{{ produk.status }}</td>
+                            <td>
+                                <a href="{% url 'produk:update' produk.id %}">
+                                    <i class="fa fa-pencil-square-o text-warning" aria-hidden="true"></i>
+                                </a>
+                                <a href="{% url 'produk:delete' produk.id %}" class="delete-button">
+                                    <i class="fa fa-trash text-danger" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+              <!-- End Table with stripped rows -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+{% endblock content %}
+
+{% block js %}
+
+    <script>
+        $(".delete-button").on("click", function(e) {
+            e.preventDefault();
+            let url = $(this).attr("href");
+            $.confirm({
+                title: 'Hapus produk ini?',
+                content: 'Produk yang dihapus tidak dapat dikembalikan!',
+                buttons: {
+                    confirm: {
+                        text: 'Ya, Hapus!',
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            $.ajax({
+                                url: url,
+                                type: 'DELETE',
+                                headers: {
+                                    'X-CSRFToken': '{{ csrf_token }}'
+                                },
+                                success: function(response) {
+                                    $.alert('Produk berhasil dihapus!');
+                                    setTimeout(function () {
+                                        location.reload();
+                                    }, 2000);
+                                },
+                                error: function(xhr, status, error) {
+                                    $.alert('Gagal menghapus produk.');
+                                }
+                            });
+                        }
+                    },
+                    cancel: {
+                        text: 'Batal',
+                        btnClass: 'btn-seccondary',
+                        action: function () {
+                            $.alert('Produk Batal dihapus!');
+                        }
+                    },
+                }
+            });
+        })
+    </script>
+
+{% endblock js %}
